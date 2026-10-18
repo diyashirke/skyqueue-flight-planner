@@ -1,4 +1,5 @@
 # Skyqueue Flight Planner
+SkyQueue is an airline reservation system in C that uses a linked-list queue as a FIFO waitlist. Users can book and cancel tickets, and when a seat is freed, the first waitlisted passenger is promoted automatically. Includes a live demo website showing the seat map, queue and promotions.
 
 Airline Reservation System using Queue (DSA project in C). The C program is in airline.c, and the website shows the same waitlist logic.
 This project was built with [Lovable](https://lovable.dev).
