@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>How Our Reservation Queue Works — SkyQueue</title>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="index.html" class="logo"><span>Sky<b>Queue</b></span></a>
+    <a href="index.html" class="btn btn-ghost btn-sm">Back to website</a>
+  </div>
+</header>
+
+<main class="container section">
+  <h1>How Our Reservation Queue Works</h1>
+  <p class="muted">Micro project: Airline Reservation System Using Queue in C.</p>
+
+  <h2 style="margin-top:32px">What is a queue?</h2>
+  <p>A queue is a line, like passengers waiting at a check-in counter. New people join at the <b>rear</b>, and the person at the <b>front</b> is served first. This rule is called <b>FIFO — First In, First Out</b>.</p>
+
+  <h2>How SkyQueue uses it</h2>
+  <ul>
+    <li>Each flight has <b>5 confirmed seats</b>.</li>
+    <li>If a seat is free, the passenger is confirmed and given the first free seat.</li>
+    <li>If all 5 seats are full, the passenger is <b>enqueued</b> (added to the rear of the waiting list).</li>
+    <li>When a confirmed passenger cancels, the passenger at the <b>front</b> of the waiting list is <b>dequeued</b> and gets that seat.</li>
+  </ul>
+
+  <h2>Linked list representation</h2>
+  <p>Each waiting passenger is a node holding a ticket ID, a name and a <code>next</code> pointer. We keep two pointers: <code>front</code> and <code>rear</code>.</p>
+  <div class="queue-diagram">
+    <span class="ptr">front →</span>
+    <span class="node">106 Karan</span><span class="arrow">→</span>
+    <span class="node">107 Neha</span><span class="arrow">→</span>
+    <span class="node">108 Arjun</span><span class="arrow">→</span>
+    <span class="muted">NULL</span>
+    <span class="ptr">← rear</span>
+  </div>
+
+  <h2>Time complexity</h2>
+  <table>
+    <tr><th>Operation</th><th>Complexity</th><th>Why</th></tr>
+    <tr><td>Enqueue (join waiting list)</td><td>O(1)</td><td>Add directly after the rear pointer</td></tr>
+    <tr><td>Dequeue (promote first waiting)</td><td>O(1)</td><td>Remove directly at the front pointer</td></tr>
+    <tr><td>Book a ticket</td><td>O(n)</td><td>Search the n = 5 seats for a free one, then O(1) enqueue if full</td></tr>
+    <tr><td>Cancel a ticket</td><td>O(n + w)</td><td>Search seats, else search the w waiting nodes</td></tr>
+    <tr><td>Display</td><td>O(n + w)</td><td>Visit every seat and every waiting node</td></tr>
+  </table>
+  <p class="muted">Space: O(n + w) — one record per passenger.</p>
+
+  <h2>C program vs browser simulation</h2>
+  <p><code>airline.c</code> is the original program, run in a terminal. Browsers cannot run C, so <code>script.js</code> re-implements the same logic (same 5 seats, same ticket numbers starting at 101, same FIFO promotion) in JavaScript. The website does not call the C program.</p>
+
+  <h2>Try it</h2>
+  <div class="card">
+    <form class="inline-form" id="demoForm" style="padding:0;box-shadow:none">
+      <div class="field"><label for="demoName">Passenger name</label><input id="demoName" placeholder="e.g. Asha"></div>
+      <button class="btn btn-primary" type="submit">Book</button>
+    </form>
+    <form class="inline-form" id="demoCancel" style="padding:0;margin-top:12px">
+      <div class="field"><label for="demoTicket">Ticket ID to cancel</label><input id="demoTicket" type="number" placeholder="101"></div>
+      <button class="btn btn-danger" type="submit">Cancel</button>
+    </form>
+    <h3 style="margin-top:20px">Seats</h3>
+    <div class="seat-map" id="demoSeats"></div>
+    <h3>Waiting queue</h3>
+    <div class="queue-diagram" id="demoQueue"></div>
+    <h3>Log</h3>
+    <div class="log" id="demoLog"></div>
+    <div class="row-actions"><button class="btn btn-ghost btn-sm" id="demoReset">Reset</button></div>
+  </div>
+</main>
+
+<script src="script.js"></script>
+<script>
+  // Small separate demo that uses the same engine as the website
+  const { FlightReservation, MAX_SEATS } = window.SkyQueueEngine;
+  let demo = new FlightReservation(), nextId = 101;
+  const log = m => { const el = document.getElementById("demoLog"); el.innerHTML = m + "<br>" + el.innerHTML; };
+  const esc = s => s.replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  function draw() {
+    document.getElementById("demoSeats").innerHTML = demo.seats.map((s, i) =>
+      `<div class="seat ${s ? "taken" : ""}"><b>${i + 1}</b>${s ? s.ticketId + " " + esc(s.name) : "Free"}</div>`).join("");
+    const q = demo.waiting.toArray();
+    document.getElementById("demoQueue").innerHTML = q.length
+      ? `<span class="ptr">front →</span>` + q.map(p => `<span class="node">${p.ticketId} ${esc(p.name)}</span>`).join('<span class="arrow">→</span>') + `<span class="arrow">→</span><span class="muted">NULL</span><span class="ptr">← rear</span>`
+      : `<span class="muted">front = rear = NULL (empty)</span>`;
+  }
+  document.getElementById("demoForm").addEventListener("submit", e => {
+    e.preventDefault();
+    const name = document.getElementById("demoName").value.trim();
+    if (!name) { log("Error: enter a name."); return; }
+    const id = nextId++, r = demo.book(id, name);
+    log(r.status === "CONFIRMED" ? `Confirmed: ticket ${id}, ${esc(name)} → seat ${r.seat}` : `Flight full (${MAX_SEATS} seats). Ticket ${id}, ${esc(name)} enqueued at position ${r.position}`);
+    document.getElementById("demoName").value = ""; draw();
+  });
+  document.getElementById("demoCancel").addEventListener("submit", e => {
+    e.preventDefault();
+    const id = Number(document.getElementById("demoTicket").value);
+    const r = demo.cancel(id);
+    if (!r.ok) log(`Error: ticket ${id} not found (or already cancelled).`);
+    else log(`Cancelled ticket ${id}.` + (r.promoted ? ` Dequeued ${esc(r.promoted.name)} (ticket ${r.promoted.ticketId}) → seat ${r.promoted.seat}` : ""));
+    draw();
+  });
+  document.getElementById("demoReset").addEventListener("click", () => { demo = new FlightReservation(); nextId = 101; document.getElementById("demoLog").innerHTML = ""; draw(); });
+  draw();
+</script>
+</body>
+</html>
