@@ -60,7 +60,8 @@ h3 { font-size: 1.1rem; }
 .search-wrap { margin-top: -100px; position: relative; }
 .card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 24px; }
 .trip-type { display: flex; gap: 24px; margin-bottom: 16px; font-weight: 600; }
-.trip-type input { accent-color: var(--navy); }
+.trip-type label { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+.trip-type input { accent-color: var(--navy); width: auto; }
 .search-grid { display: grid; grid-template-columns: 1fr auto 1fr 1fr 1fr .7fr 1fr; gap: 12px; align-items: end; }
 .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
 .search-grid .field { margin-bottom: 0; }
