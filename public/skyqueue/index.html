@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkyQueue — Book Flights Across India</title>
+  <meta name="description" content="Search flights, book, manage your booking and check flight status with SkyQueue.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="#home" class="logo" aria-label="SkyQueue home">
+      <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="15" fill="#0b2a5b"/><path d="M7 18l18-7-6 12-3-4-4 3 1-4z" fill="#7cc4f2"/></svg>
+      <span>Sky<b>Queue</b></span>
+    </a>
+    <button class="menu-toggle" id="menuToggle" aria-label="Open menu" aria-expanded="false">&#9776;</button>
+    <nav class="main-nav" id="mainNav">
+      <a href="#home">Home</a>
+      <a href="#book">Book a Flight</a>
+      <a href="#manage">Manage Booking</a>
+      <a href="#status">Flight Status</a>
+      <a href="#checkin">Check-in</a>
+      <a href="#help">Help</a>
+      <a href="#book" class="btn btn-primary btn-sm">Book now</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <!-- HERO + SEARCH -->
+  <section class="hero" id="home">
+    <div class="container">
+      <h1>Your Journey Begins Here.</h1>
+      <p class="hero-sub">Discover your next destination with SkyQueue.</p>
+    </div>
+  </section>
+
+  <section class="container search-wrap" id="book">
+    <form class="card search-card" id="searchForm" novalidate>
+      <div class="trip-type">
+        <label><input type="radio" name="tripType" value="oneway" checked> One Way</label>
+        <label><input type="radio" name="tripType" value="round"> Round Trip</label>
+      </div>
+      <div class="search-grid">
+        <div class="field">
+          <label for="from">From</label>
+          <select id="from"></select>
+        </div>
+        <button type="button" class="swap-btn" id="swapBtn" aria-label="Swap airports">&#8646;</button>
+        <div class="field">
+          <label for="to">To</label>
+          <select id="to"></select>
+        </div>
+        <div class="field">
+          <label for="departDate">Departure</label>
+          <input type="date" id="departDate">
+        </div>
+        <div class="field" id="returnField">
+          <label for="returnDate">Return</label>
+          <input type="date" id="returnDate" disabled>
+        </div>
+        <div class="field">
+          <label for="passengers">Passengers</label>
+          <select id="passengers">
+            <option>1</option><option>2</option><option>3</option><option>4</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="cabin">Cabin</label>
+          <select id="cabin">
+            <option>Economy</option><option>Premium Economy</option><option>Business</option>
+          </select>
+        </div>
+      </div>
+      <p class="form-error" id="searchError" role="alert"></p>
+      <div class="search-actions">
+        <span class="note">Demo schedules and fares — not live data.</span>
+        <button type="submit" class="btn btn-primary">Search Flights</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- BOOKING FLOW (hidden until search) -->
+  <section class="container section" id="flow" hidden>
+    <ol class="steps" id="steps">
+      <li data-step="1">Select flight</li>
+      <li data-step="2">Passenger details</li>
+      <li data-step="3">Review</li>
+      <li data-step="4">Confirmation</li>
+    </ol>
+
+    <div id="step1">
+      <h2 id="resultsTitle">Available flights</h2>
+      <p class="muted" id="seatInfo"></p>
+      <div id="results" class="results"></div>
+    </div>
+
+    <div id="step2" hidden>
+      <h2>Passenger details</h2>
+      <form class="card" id="paxForm" novalidate>
+        <div id="paxFields"></div>
+        <div class="field"><label for="email">Contact email</label><input type="email" id="email" placeholder="you@example.com"></div>
+        <div class="field"><label for="phone">Mobile number</label><input type="tel" id="phone" placeholder="10-digit mobile"></div>
+        <p class="form-error" id="paxError" role="alert"></p>
+        <div class="row-actions">
+          <button type="button" class="btn btn-ghost" data-back="1">Back</button>
+          <button type="submit" class="btn btn-primary">Continue</button>
+        </div>
+      </form>
+    </div>
+
+    <div id="step3" hidden>
+      <h2>Review your booking</h2>
+      <div class="card" id="reviewBox"></div>
+      <p class="note">No payment is collected. This is a demonstration reservation.</p>
+      <div class="row-actions">
+        <button type="button" class="btn btn-ghost" data-back="2">Back</button>
+        <button type="button" class="btn btn-primary" id="confirmBtn">Confirm reservation</button>
+      </div>
+    </div>
+
+    <div id="step4" hidden>
+      <div class="card confirm-card" id="confirmBox"></div>
+      <div class="row-actions">
+        <a href="#manage" class="btn btn-ghost">Manage this booking</a>
+        <a href="#book" class="btn btn-primary" id="newSearch">Book another flight</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- MANAGE -->
+  <section class="section alt" id="manage">
+    <div class="container two-col">
+      <div>
+        <h2>Manage Booking</h2>
+        <p class="muted">Retrieve your demo booking using the reference shown on your confirmation (for example SQ-101).</p>
+        <form class="card inline-form" id="manageForm" novalidate>
+          <div class="field"><label for="manageRef">Booking reference</label><input id="manageRef" placeholder="SQ-101"></div>
+          <button class="btn btn-primary" type="submit">Retrieve</button>
+        </form>
+        <p class="form-error" id="manageError" role="alert"></p>
+        <div id="manageResult"></div>
+      </div>
+      <div>
+        <h3>Seat availability</h3>
+        <p class="muted">Each demo flight has 5 seats. Extra bookings join a waiting list and are given the next free seat in the order they booked.</p>
+        <select id="manifestFlight" aria-label="Choose flight"></select>
+        <div id="manifest"></div>
+        <button class="btn btn-ghost btn-sm" id="resetBtn" type="button">Reset demo data</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATUS + CHECKIN -->
+  <section class="section container two-col">
+    <div id="status">
+      <h2>Flight Status</h2>
+      <p class="muted">Demonstration only — statuses are sample values.</p>
+      <form class="card inline-form" id="statusForm" novalidate>
+        <div class="field"><label for="statusNo">Flight number</label><input id="statusNo" placeholder="SQ 210"></div>
+        <button class="btn btn-primary" type="submit">Check status</button>
+      </form>
+      <div id="statusResult"></div>
+    </div>
+    <div id="checkin">
+      <h2>Check-in</h2>
+      <div class="card unavailable">
+        <strong>Online check-in is not available in this demo.</strong>
+        <p class="muted">You can view your seat number in Manage Booking.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- DESTINATIONS -->
+  <section class="section container">
+    <h2>Popular destinations</h2>
+    <div class="dest-grid">
+      <article class="dest"><img src="images/goa.jpg" alt="Goa beach at sunset" loading="lazy"><div><h3>Goa</h3><p>From ₹3,899*</p></div></article>
+      <article class="dest"><img src="images/jaipur.jpg" alt="Hawa Mahal in Jaipur" loading="lazy"><div><h3>Jaipur</h3><p>From ₹4,299*</p></div></article>
+      <article class="dest"><img src="images/kerala.jpg" alt="Kerala backwaters houseboat" loading="lazy"><div><h3>Kochi</h3><p>From ₹4,799*</p></div></article>
+    </div>
+    <p class="note">*Illustrative sample fares.</p>
+  </section>
+
+  <!-- TRAVEL INFO -->
+  <section class="section alt">
+    <div class="container info-grid">
+      <div><h3>Baggage (illustrative)</h3><p>Cabin: 1 bag up to 7 kg. Check-in: 15 kg Economy, 20 kg Premium Economy, 30 kg Business.</p></div>
+      <div><h3>At the airport</h3><p>Arrive at least 2 hours before domestic departures. Keep a valid photo ID ready.</p></div>
+      <div><h3>Changes &amp; cancellation</h3><p>Demo bookings can be cancelled anytime from Manage Booking.</p></div>
+    </div>
+  </section>
+
+  <!-- HELP / FAQ -->
+  <section class="section container" id="help">
+    <h2>Help &amp; FAQs</h2>
+    <details><summary>Are these real flights?</summary><p>No. SkyQueue is a demonstration website. Flights, times and fares are sample data and no payment is taken.</p></details>
+    <details><summary>What happens if a flight is full?</summary><p>You are added to the waiting list. When a confirmed passenger cancels, the first person on the waiting list automatically gets the seat.</p></details>
+    <details><summary>How do I cancel?</summary><p>Open Manage Booking, enter your reference and choose Cancel booking.</p></details>
+    <details><summary>How do I contact support?</summary><p>This demo has no live support line. Use the FAQs above for help.</p></details>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div><span class="logo-text">Sky<b>Queue</b></span><p>A demonstration airline booking experience.</p></div>
+    <div><h4>Book</h4><a href="#book">Search flights</a><a href="#manage">Manage booking</a></div>
+    <div><h4>Travel</h4><a href="#status">Flight status</a><a href="#checkin">Check-in</a></div>
+    <div><h4>About</h4><a href="queue.html">How Our Reservation Queue Works</a><a href="#help">Help</a></div>
+  </div>
+  <div class="container copyright">© 2026 SkyQueue demo project. Not a real airline.</div>
+</footer>
+
+<div class="toast" id="toast" role="status"></div>
+<script src="script.js"></script>
+</body>
+</html>
