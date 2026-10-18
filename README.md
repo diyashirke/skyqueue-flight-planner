@@ -1,7 +1,6 @@
 # Skyqueue Flight Planner
 
-built this website
-
+Airline Reservation System using Queue (DSA project in C). The C program is in airline.c, and the website shows the same waitlist logic.
 This project was built with [Lovable](https://lovable.dev).
 
 **Live app**: https://skyqueue-flight-planner.lovable.app
